@@ -57,7 +57,7 @@ export default function HomePage() {
 
   if (!session) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-white text-black">
+      <div className="flex flex-col items-center justify-center h-screen" style={{ background: 'var(--background)', color: 'var(--foreground)', boxShadow: 'none' }}>
         <h1 className="text-4xl font-extrabold mb-4">Open-ADR</h1>
         <p className="text-lg max-w-xl text-center">
           Welcome to Open-ADR, a platform for managing and visualizing Architecture Decision Records (ADRs) in your software projects.
