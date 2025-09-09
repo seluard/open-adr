@@ -6,10 +6,10 @@ import React from "react";
 import Navbar from "./Navbar";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  return (
-    <SessionProvider>
-      <Navbar />
-      {children}
-    </SessionProvider>
-  );
+	return (
+		<SessionProvider>
+			<Navbar />
+			{children}
+		</SessionProvider>
+	);
 }
