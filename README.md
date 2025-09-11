@@ -25,7 +25,7 @@ Engineering teams write Architecture Decision Records (ADRs) but they often beco
 | Area | Included Now | Planned Next |
 |------|--------------|--------------|
 | Authentication | GitHub OAuth via NextAuth | Fine‑grained token scopes |
-| ADR Detection | `docs/adr/`, `docs/decisions/` | Custom path config |
+| ADR Detection | `docs/adr/`, `docs/decisions/`. `adr` | Custom path config |
 | Listing | Status + basic metadata | Search / filters / tags |
 | Viewing | Render markdown (GitHub content) | In‑place diff / history |
 | Status Parsing | Front‑matter YAML `status:` | Validation + linter rules |
@@ -218,6 +218,7 @@ Then configure your reverse proxy / TLS to expose `https://adr.example.com` to u
 |--------|---------|-------|
 | `docs/adr/` | `docs/adr/0001-first-decision.md` | Preferred if you keep docs grouped |
 | `docs/decisions/` | `docs/decisions/0002-something.md` | Common alternate |
+| `adr` | `adr/0003-final.md` | Common alternate |
 
 ## Example ADR Front-Matter
 
