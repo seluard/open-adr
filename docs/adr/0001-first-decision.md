@@ -1,5 +1,5 @@
 ---
-status: "accepted"
+status: accepted
 date: 11-09-2025
 decision-makers: seluard
 consulted: seluard
