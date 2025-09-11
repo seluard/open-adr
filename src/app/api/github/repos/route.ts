@@ -1,7 +1,7 @@
 // app/api/github/repos/route.ts
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Octokit } from "@octokit/rest";
 
 export async function GET() {
