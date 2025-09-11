@@ -87,7 +87,10 @@ export default function Sidebar({ onSelectRepo }: { onSelectRepo: (repo: Record<
 						<button
 							type="button"
 							className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${publicSearch ? 'bg-blue-600' : 'bg-gray-300'}`}
-							onClick={() => setPublicSearch(!publicSearch)}
+							onClick={() => {
+								setPublicSearch(!publicSearch);
+								setNameFilter(""); // Clear search bar when toggling
+							}}
 						>
 							<span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${publicSearch ? 'translate-x-5' : 'translate-x-1'}`}></span>
 						</button>
