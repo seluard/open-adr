@@ -8,7 +8,7 @@ export async function GET(req: Request) {
 	const url = new URL(req.url);
 	const owner = url.searchParams.get("owner");
 	const repo = url.searchParams.get("repo");
-	const pathsToTry = ["docs/adr", "docs/decisions"];
+	const pathsToTry = ["docs/adr", "docs/decisions","adr"];
 	if (!owner || !repo) return NextResponse.json({ error: "Missing params" }, { status: 400 });
 
 	const session = await getServerSession(authOptions as any);
