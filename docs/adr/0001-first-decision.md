@@ -1,8 +1,9 @@
 ---
-title: Test new folder of decisions
-date: 11-09-20025
-status: accepted
-tags: [test, adr]
+status: "accepted"
+date: 11-09-2025
+decision-makers: seluard
+consulted: seluard
+informed: seluard
 ---
 
 # Create Open-ADR
