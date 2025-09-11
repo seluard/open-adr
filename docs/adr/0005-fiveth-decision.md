@@ -1,7 +1,7 @@
 ---
 title: Test new folder of decisions
 date: 11-09-20025
-status: accepted
+status: proposed
 tags: [test, adr]
 ---
 

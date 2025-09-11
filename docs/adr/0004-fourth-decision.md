@@ -1,7 +1,7 @@
 ---
 title: Test new folder of decisions
 date: 11-09-20025
-status: accepted
+status: superseded by 0005
 tags: [test, adr]
 ---
 
