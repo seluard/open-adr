@@ -173,7 +173,7 @@ export default function HomePage() {
 											}`}
 										>
 											<div className="flex justify-between items-center">
-												<span>{adr.name}</span>
+												<span>{adr.name.replace(/\.md$/i, '')}</span>
 												{adr.status && (
 													<span
 														className={`ml-2 px-2 py-1 text-xs rounded font-semibold border
@@ -209,16 +209,18 @@ export default function HomePage() {
 									<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 										{adrContent.metadata.status && (
 											<div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-												<div className="flex items-center justify-between">
-													<span className="text-sm font-medium text-gray-600 uppercase tracking-wide">Status</span>
-													<span className={`px-3 py-1 rounded-full text-sm font-semibold border ${
-														adrContent.metadata.status === 'accepted' ? 'bg-green-100 text-green-800 border-green-300' :
-														adrContent.metadata.status === 'proposed' ? 'bg-blue-100 text-blue-800 border-blue-300' :
-														adrContent.metadata.status === 'rejected' ? 'bg-red-100 text-red-800 border-red-300' :
-														adrContent.metadata.status === 'deprecated' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' :
-														adrContent.metadata.status.includes('superseded') ? 'bg-gray-100 text-gray-800 border-gray-300' :
-														'bg-gray-100 text-gray-800 border-gray-300'
-													}`}>
+												<div className="flex flex-col">
+													<span className="text-sm font-medium text-gray-600 uppercase tracking-wide mb-2">Status</span>
+													<span
+														className={`inline-block w-fit px-3 py-1 rounded-full text-sm font-semibold border ${
+															adrContent.metadata.status === 'accepted' ? 'bg-green-100 text-green-800 border-green-300' :
+															adrContent.metadata.status === 'proposed' ? 'bg-blue-100 text-blue-800 border-blue-300' :
+															adrContent.metadata.status === 'rejected' ? 'bg-red-100 text-red-800 border-red-300' :
+															adrContent.metadata.status === 'deprecated' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' :
+															adrContent.metadata.status.includes('superseded') ? 'bg-gray-100 text-gray-800 border-gray-300' :
+															'bg-gray-100 text-gray-800 border-gray-300'
+														}`}
+													>
 														{adrContent.metadata.status}
 													</span>
 												</div>
