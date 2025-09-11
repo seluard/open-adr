@@ -1,16 +1,16 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #f8fafc;
-  --foreground: #222222;
+  --background: #ffffff;
+  --foreground: #000000;
 }
 
-
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  transition: background 0.2s, color 0.2s;
 }
 
 a {
@@ -23,7 +23,42 @@ a:hover {
   color: #1e40af;
 }
 
+/* Custom prose styling to ensure proper markdown rendering */
 .prose {
   color: var(--foreground);
+  max-width: none;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.prose strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.prose code {
+  color: var(--foreground);
+  background-color: #f1f5f9;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+.prose pre {
+  background-color: #f1f5f9;
+  color: var(--foreground);
+}
+
+.prose pre code {
+  background-color: transparent;
+  padding: 0;
 }
 

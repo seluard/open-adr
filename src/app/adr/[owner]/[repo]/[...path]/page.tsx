@@ -8,7 +8,7 @@ export default function AdrDetail() {
 	const params = useParams() as Record<string, string | string[]>;
 	const owner = params.owner;
 	const repo = params.repo;
-	// path es un array por catch-all; en useParams viene como string con '/'. En Next 13, la ruta catch-all expresa diferente; adaptalo:
+	// path is an array for catch-all; in useParams it comes as string with '/'. In Next 13, catch-all route behaves differently; adapt it:
 	const pathParts = params.path ? (Array.isArray(params.path) ? params.path : [params.path]) : [];
 	const filepath = pathParts.join("/");
 
@@ -23,11 +23,11 @@ export default function AdrDetail() {
 		if (filepath) load();
 	}, [owner, repo, filepath]);
 
-	if (!filepath) return <div>Archivo no especificado</div>;
-	if (!content) return <div>Cargando contenido...</div>;
+	if (!filepath) return <div>File not specified</div>;
+	if (!content) return <div>Loading content...</div>;
 
 	return (
-		<div className="prose p-8">
+		<div className="prose prose-slate max-w-none p-8 mx-auto">
 			<ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
 		</div>
 	);

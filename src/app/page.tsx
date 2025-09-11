@@ -14,7 +14,7 @@ export default function HomePage() {
 	const [adrContent, setAdrContent] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
 
-	// Fetch ADRs cuando se selecciona repo
+	// Fetch ADRs when repo is selected
 	useEffect(() => {
 		if (selectedRepo) {
 			setLoading(true);
@@ -35,7 +35,7 @@ export default function HomePage() {
 		}
 	}, [selectedRepo]);
 
-	// Fetch contenido ADR cuando se selecciona
+	// Fetch ADR content when selected
 	useEffect(() => {
 		if (selectedRepo && selectedAdr) {
 			setAdrContent(null);
@@ -46,11 +46,11 @@ export default function HomePage() {
 			)
 				.then((res) => res.json())
 				.then((data) => {
-					setAdrContent(data.content || "No se pudo cargar el ADR");
+					setAdrContent(data.content || "No ADR content available");
 					setLoading(false);
 				})
 				.catch(() => {
-					setAdrContent("Error cargando ADR");
+					setAdrContent("Error loading ADR");
 					setLoading(false);
 				});
 		}
@@ -86,9 +86,9 @@ export default function HomePage() {
 			{/* Sidebar */}
 			<Sidebar onSelectRepo={setSelectedRepo} />
 
-			{/* Main content: lista de ADRs y detalle */}
+			{/* Main content: ADR list and detail */}
 			<div className="flex flex-1 h-full">
-				{/* Lista de ADRs */}
+				{/* ADR List */}
 				<div
 					className="w-1/3 max-w-xs min-w-[220px] p-6 overflow-y-auto"
 					style={{ background: undefined, color: undefined }}
@@ -153,7 +153,7 @@ export default function HomePage() {
 						<p className="text-gray-500">Select a repository to view ADRs.</p>
 					)}
 				</div>
-				{/* Detalle ADR */}
+				{/* ADR Detail */}
 				<div className="flex-1 p-6 overflow-y-auto">
 					{loading && selectedAdr && <p>Loading ADR content...</p>}
 					{!loading && adrContent && (

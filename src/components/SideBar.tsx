@@ -41,7 +41,7 @@ export default function Sidebar({ onSelectRepo }: { onSelectRepo: (repo: Record<
 	}, [dropdownOpen]);
 	const [nameFilter, setNameFilter] = useState<string>("");
 
-	// Switch para búsqueda pública
+	// Switch for public search
 	const [publicSearch, setPublicSearch] = useState(false);
 	const [publicRepos, setPublicRepos] = useState<any[]>([]);
 	useEffect(() => {
