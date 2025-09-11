@@ -6,10 +6,13 @@ tags: [test, adr]
 ---
 
 # Create Open-ADR
+
 This lives in "/docs/adr/"
 
 ## Context
+
 ADR centralized view it's something that it's needed
 
 ## Decision
+
 We will use others to build on top
