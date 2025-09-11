@@ -1,10 +1,12 @@
-![Open-ADR Logo](public/logo.png)
-
 # Open-ADR
+
+![Open-ADR Logo](public/logo.png)
 
 
 > Discover, browse & (soon) manage Architecture Decision Records across your GitHub repositories.  
 > *Status: Experimental – validating community interest before expanding authoring & management features.*
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fseluard%2Fopen-adr)
 
 ---
 
@@ -91,11 +93,124 @@ openssl rand -base64 48
 ```bash
 npm run dev
 ```
+
 Visit: <http://localhost:3000> and sign in with GitHub.
 
 ### 5. Try It
 
 Use the UI to point at any repository you have access to that contains ADRs in one of the supported folders.
+
+## Deploy on Vercel
+
+Open-ADR is a Next.js App Router app and works great on Vercel.
+
+* Click the button at the top or go here: <https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fseluard%2Fopen-adr>
+* When prompted, set environment variables:
+	* `GITHUB_ID` – GitHub OAuth App Client ID
+	* `GITHUB_SECRET` – GitHub OAuth App Client Secret
+	* `NEXTAUTH_SECRET` – a long random string
+	* `NEXTAUTH_URL` – your Vercel URL (e.g. `https://<your-project>.vercel.app`)
+
+GitHub OAuth callback URL:
+
+* Set the OAuth App “Authorization callback URL” to: `https://<your-project>.vercel.app/api/auth/callback/github`.
+* Preview deployments have different domains; GitHub OAuth Apps allow only one callback URL. For smooth dev + prod:
+	* Option A (recommended): create a second OAuth App for production with the Vercel domain (keep your local one for `localhost`).
+	* Option B: update the single OAuth App callback when switching between local and production.
+
+After the first deploy, you can attach the project to your repo for CI/CD and preview deployments (note: previews won’t authenticate unless the callback matches).
+
+## Self‑Hosting
+
+You can run Open-ADR on your own infrastructure. Two common ways are shown below.
+
+### Option A: Manual (Node.js)
+
+Prerequisites:
+
+* Node.js 18+ (or a compatible runtime used by Next.js 14+)
+* A public URL (domain) and TLS termination (e.g., behind Nginx, Caddy, or a cloud load balancer)
+
+Steps:
+
+1. Configure environment variables on your host:
+
+```bash
+GITHUB_ID=your_client_id
+GITHUB_SECRET=your_client_secret
+NEXTAUTH_SECRET=generate_a_long_random_string
+NEXTAUTH_URL=https://adr.example.com
+```
+
+1. Build and start:
+
+```bash
+npm install
+npm run build
+npm start
+```
+
+1. In your GitHub OAuth App, set the Authorization callback URL to:
+
+```text
+https://adr.example.com/api/auth/callback/github
+```
+
+Optional Nginx reverse proxy snippet:
+
+```nginx
+server {
+	server_name adr.example.com;
+
+	location / {
+		proxy_pass http://127.0.0.1:3000;
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+	}
+}
+```
+
+### Option B: Docker
+
+If you prefer containers, you can use a simple Dockerfile like this (save as `Dockerfile` in the repo):
+
+```dockerfile
+# --- build stage ---
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# --- run stage ---
+FROM node:18-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/package*.json ./
+RUN npm ci --omit=dev
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.ts ./next.config.ts
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+Build and run:
+
+```bash
+docker build -t open-adr:latest .
+docker run --rm -p 3000:3000 \
+	-e GITHUB_ID=your_client_id \
+	-e GITHUB_SECRET=your_client_secret \
+	-e NEXTAUTH_SECRET=generate_a_long_random_string \
+	-e NEXTAUTH_URL=https://adr.example.com \
+	open-adr:latest
+```
+
+Then configure your reverse proxy / TLS to expose `https://adr.example.com` to users.
 
 ## Folder Conventions Supported
 
@@ -113,6 +228,7 @@ date: 2025-09-11
 decision-makers: team-architecture
 ---
 ```
+ 
 Unrecognized status values are shown as `unknown` (for now).
 
 ## ADR / MADR Standards & Templates
