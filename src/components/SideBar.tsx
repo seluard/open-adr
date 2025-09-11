@@ -111,7 +111,9 @@ export default function Sidebar({ onSelectRepo }: { onSelectRepo: (repo: Record<
 						<li
 							key={repo.id}
 							onClick={() => { setSelectedId(repo.id); onSelectRepo(repo); }}
-							className={`cursor-pointer p-3 rounded-xl transition-all duration-200 hover:bg-gray-100 shadow`}
+							className={`cursor-pointer p-3 rounded-xl transition-all duration-200 hover:bg-gray-100 shadow ${
+								selectedId === repo.id ? "bg-gray-200 font-bold ring-2 ring-gray-300" : ""
+							}`}
 						>
 							<div className="font-semibold text-base">{repo.name}</div>
 							<div className="text-xs text-gray-500">{repo.full_name}</div>
