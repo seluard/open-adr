@@ -1,12 +1,12 @@
 ---
-title: First test of OpenADR
-date: 07-09-20025
+title: Test new folder of decisions
+date: 11-09-20025
 status: proposed
 tags: [test, adr]
 ---
 
 # Create Open-ADR
-This lives in /adr/
+This lives in "/docs/decisions/"
 
 ## Context
 ADR centralized view it's something that it's needed
