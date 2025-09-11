@@ -1,7 +1,6 @@
 # Open-ADR
 
-![Open-ADR Logo](public/logo.png)
-
+<img src="public/logo.png" width="200">
 
 > Discover, browse & (soon) manage Architecture Decision Records across your GitHub repositories.  
 > *Status: Experimental – validating community interest before expanding authoring & management features.*
