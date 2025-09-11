@@ -11,7 +11,7 @@ export default function HomePage() {
 		const [adrs, setAdrs] = useState<Array<{ sha: string; name: string; path: string; status?: string }> | null>(null);
 		const [statusFilter, setStatusFilter] = useState<string>("");
 		const [selectedAdr, setSelectedAdr] = useState<{ sha: string; name: string; path: string } | null>(null);
-	const [adrContent, setAdrContent] = useState<string | null>(null);
+	const [adrContent, setAdrContent] = useState<{frontMatter: string | null, metadata: Record<string, string>, content: string} | null>(null);
 	const [loading, setLoading] = useState(false);
 
 	// Fetch ADRs when repo is selected
@@ -35,6 +35,47 @@ export default function HomePage() {
 		}
 	}, [selectedRepo]);
 
+	// Function to extract and parse front matter
+	const extractFrontMatter = (content: string) => {
+		if (content.startsWith('---')) {
+			const lines = content.split('\n');
+			let frontMatterLines = [];
+			let foundEnd = false;
+			
+			for (let i = 1; i < lines.length; i++) {
+				if (lines[i].trim() === '---') {
+					foundEnd = true;
+					break;
+				}
+				frontMatterLines.push(lines[i]);
+			}
+			
+			if (foundEnd) {
+				const frontMatterText = frontMatterLines.join('\n');
+				const remainingContent = lines.slice(frontMatterLines.length + 2).join('\n');
+				
+				// Parse YAML-like content into key-value pairs
+				const metadata: Record<string, string> = {};
+				frontMatterLines.forEach(line => {
+					const trimmedLine = line.trim();
+					if (trimmedLine && !trimmedLine.startsWith('#')) {
+						const colonIndex = trimmedLine.indexOf(':');
+						if (colonIndex > 0) {
+							const key = trimmedLine.substring(0, colonIndex).trim();
+							const value = trimmedLine.substring(colonIndex + 1).trim().replace(/^["']|["']$/g, '');
+							if (value) {
+								metadata[key] = value;
+							}
+						}
+					}
+				});
+				
+				return { frontMatter: frontMatterText, metadata, content: remainingContent };
+			}
+		}
+		return { frontMatter: null, metadata: {}, content };
+	};
+
 	// Fetch ADR content when selected
 	useEffect(() => {
 		if (selectedRepo && selectedAdr) {
@@ -46,11 +87,15 @@ export default function HomePage() {
 			)
 				.then((res) => res.json())
 				.then((data) => {
-					setAdrContent(data.content || "No ADR content available");
+					const rawContent = data.content || "No ADR content available";
+					const { frontMatter, metadata, content } = extractFrontMatter(rawContent);
+					
+					// Store the front matter, parsed metadata, and clean content
+					setAdrContent({ frontMatter, metadata, content });
 					setLoading(false);
 				})
 				.catch(() => {
-					setAdrContent("Error loading ADR");
+					setAdrContent({ frontMatter: null, metadata: {}, content: "Error loading ADR" });
 					setLoading(false);
 				});
 		}
@@ -157,8 +202,60 @@ export default function HomePage() {
 				<div className="flex-1 p-6 overflow-y-auto">
 					{loading && selectedAdr && <p>Loading ADR content...</p>}
 					{!loading && adrContent && (
-						<div className="prose max-w-3xl">
-							<ReactMarkdown>{adrContent}</ReactMarkdown>
+						<div className="max-w-4xl">
+							{/* Front Matter Section */}
+							{adrContent.frontMatter && Object.keys(adrContent.metadata).length > 0 && (
+								<div className="mb-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg shadow-sm">
+									<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+										{adrContent.metadata.status && (
+											<div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+												<div className="flex items-center justify-between">
+													<span className="text-sm font-medium text-gray-600 uppercase tracking-wide">Status</span>
+													<span className={`px-3 py-1 rounded-full text-sm font-semibold border ${
+														adrContent.metadata.status === 'accepted' ? 'bg-green-100 text-green-800 border-green-300' :
+														adrContent.metadata.status === 'proposed' ? 'bg-blue-100 text-blue-800 border-blue-300' :
+														adrContent.metadata.status === 'rejected' ? 'bg-red-100 text-red-800 border-red-300' :
+														adrContent.metadata.status === 'deprecated' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' :
+														adrContent.metadata.status.includes('superseded') ? 'bg-gray-100 text-gray-800 border-gray-300' :
+														'bg-gray-100 text-gray-800 border-gray-300'
+													}`}>
+														{adrContent.metadata.status}
+													</span>
+												</div>
+											</div>
+										)}
+										{adrContent.metadata.date && (
+											<div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+												<span className="text-sm font-medium text-gray-600 uppercase tracking-wide block mb-2">Date</span>
+												<span className="text-lg font-semibold text-gray-900">{adrContent.metadata.date}</span>
+											</div>
+										)}
+										{adrContent.metadata['decision-makers'] && (
+											<div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+												<span className="text-sm font-medium text-gray-600 uppercase tracking-wide block mb-2">Decision Makers</span>
+												<span className="text-gray-900 font-medium">{adrContent.metadata['decision-makers']}</span>
+											</div>
+										)}
+										{adrContent.metadata.consulted && (
+											<div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+												<span className="text-sm font-medium text-gray-600 uppercase tracking-wide block mb-2">Consulted</span>
+												<span className="text-gray-900 font-medium">{adrContent.metadata.consulted}</span>
+											</div>
+										)}
+										{adrContent.metadata.informed && (
+											<div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+												<span className="text-sm font-medium text-gray-600 uppercase tracking-wide block mb-2">Informed</span>
+												<span className="text-gray-900 font-medium">{adrContent.metadata.informed}</span>
+											</div>
+										)}
+									</div>
+								</div>
+							)}
+							
+							{/* Markdown Content */}
+							<div className="prose max-w-none">
+								<ReactMarkdown>{adrContent.content}</ReactMarkdown>
+							</div>
 						</div>
 					)}
 				</div>
