@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Sidebar from "@/components/SideBar";
 import ReactMarkdown from "react-markdown";
 import { useSession } from "next-auth/react";
+import Logo from "@/components/Logo";
 
 export default function HomePage() {
 	const { data: session } = useSession();
@@ -103,10 +104,16 @@ export default function HomePage() {
 
 	if (!session) {
 		return (
-			<div className="flex flex-col items-center justify-center h-screen" style={{ background: 'var(--background)', color: 'var(--foreground)', boxShadow: 'none' }}>
-				<h1 className="text-4xl font-extrabold mb-4">Open-ADR</h1>
-				<p className="text-lg max-w-xl text-center">
-					Welcome to Open-ADR, a platform for managing and visualizing Architecture Decision Records (ADRs) in your software projects.
+			<div className="flex flex-col items-center justify-center h-screen px-6 text-center" style={{ background: 'var(--background)', color: 'var(--foreground)', boxShadow: 'none' }}>
+				<div className="flex flex-col items-center mb-12">
+					<Logo size={160} className="mb-6" />
+					<h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4">Open-ADR</h1>
+				</div>
+				<p className="text-2xl md:text-3xl leading-snug font-medium max-w-3xl mb-10">
+					Discover, browse & (soon) manage Architecture Decision Records across your GitHub repositories.
+				</p>
+				<p className="text-lg md:text-xl text-gray-600 max-w-2xl">
+					Sign in with GitHub to scan a repository for ADR folders (<code>docs/adr</code>, <code>docs/decisions</code>, or <code>adr</code>) and read decision records with normalized status parsing.
 				</p>
 			</div>
 		);

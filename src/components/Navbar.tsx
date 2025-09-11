@@ -4,13 +4,17 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import React from "react";
+import Logo from "./Logo";
 
 export default function Navbar() {
 	const { data: session } = useSession();
 
 	return (
 	<nav className="flex items-center justify-between px-5 py-2 shadow-md" style={{ boxShadow: '0 4px 16px -4px rgba(0,0,0,0.15)' }}>
-			<h1 className="text-3xl font-extrabold tracking-tight">Open-ADR</h1>
+			<div className="flex items-center gap-3">
+				<Logo size={40} />
+				<h1 className="text-2xl font-extrabold tracking-tight">Open-ADR</h1>
+			</div>
 			<div>
 				{session ? (
 					<div className="flex items-center gap-4">
