@@ -114,7 +114,7 @@ export default function HomePage() {
 	// Unauthenticated landing hero
 	if (!session) {
 		return (
-			<div className="relative flex items-center justify-center h-[calc(100vh-2rem)] overflow-hidden rounded-3xl bg-white/70 dark:bg-white/60">
+			<div className="relative flex items-center justify-center min-h-[calc(100vh-2rem)] overflow-x-hidden overflow-y-auto rounded-3xl bg-white/70 dark:bg-white/60">
 				{/* Decorative gradient blobs */}
 				<div className="pointer-events-none absolute inset-0 -z-10">
 					<div className="absolute -top-24 -left-16 h-72 w-72 bg-gradient-to-tr from-indigo-300 via-blue-300 to-cyan-200 rounded-full blur-3xl opacity-60" />
