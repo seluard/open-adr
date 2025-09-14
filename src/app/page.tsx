@@ -1,10 +1,8 @@
 "use client";
-
-import { useState } from "react";
 import AdrBrowser from "@/components/AdrBrowser";
 import { signIn, useSession } from "next-auth/react";
-import Logo from "@/components/Logo";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function HomePage() {
 	const { data: session } = useSession();
@@ -49,7 +47,7 @@ export default function HomePage() {
 							className="group inline-flex items-center rounded-xl bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 p-[2px] shadow-lg transition hover:shadow-xl active:translate-y-px"
 						>
 							<span className="inline-flex items-center gap-2 rounded-[10px] bg-white/80 px-5 py-3 text-gray-900 backdrop-blur-sm">
-								<img src="/globe.svg" alt="" className="h-5 w-5 opacity-80 transition group-hover:opacity-100" />
+								<Image src="/globe.svg" alt="" width={20} height={20} className="h-5 w-5 opacity-80 transition group-hover:opacity-100" />
 								<span className="font-medium">Explore public repositories</span>
 							</span>
 						</Link>
@@ -70,7 +68,7 @@ export default function HomePage() {
 											className="group inline-flex items-center rounded-xl bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 p-[2px] shadow-lg transition hover:shadow-xl active:translate-y-px"
 										>
 											<span className="inline-flex items-center gap-2 rounded-[10px] bg-white/85 px-4 py-2 text-sm text-gray-900 backdrop-blur-sm group-hover:bg-white">
-												<img src="/file.svg" alt="" className="h-4 w-4 opacity-90 transition group-hover:opacity-100" />
+												<Image src="/file.svg" alt="" width={16} height={16} className="h-4 w-4 opacity-90 transition group-hover:opacity-100" />
 												<span className="font-medium">{owner}/{repo}</span>
 											</span>
 										</Link>
@@ -85,11 +83,14 @@ export default function HomePage() {
 
 					{/* Screenshot mock */}
 					<div className="flex flex-col items-center w-full">
-						<img
+						<Image
 							src="/screenshot.png"
 							alt="App screenshot"
+							width={1280}
+							height={720}
 							className="mx-auto rounded-2xl shadow-2xl border border-gray-200 w-full max-w-4xl h-auto"
 							style={{ maxHeight: 720 }}
+							priority
 						/>
 					</div>
 				</div>

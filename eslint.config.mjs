@@ -10,15 +10,15 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript", {
-    overrides: [
-      {
-        rules: {
-        "@typescript-eslint/no-explicit-any": "off"
-        },
-      },
-    ],
-  }),
+  // Next.js recommended configs (via compat)
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  // Custom project rules
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+  // Ignore build artifacts
   {
     ignores: [
       "node_modules/**",

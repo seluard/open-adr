@@ -9,7 +9,9 @@ export async function GET(req: Request) {
 	const owner = url.searchParams.get("owner");
 	const repo = url.searchParams.get("repo");
 	let filepath = url.searchParams.get("path");
-	filepath && (filepath = decodeURIComponent(filepath));
+	if (filepath) {
+		filepath = decodeURIComponent(filepath);
+	}
 	if (!owner || !repo || !filepath) return NextResponse.json({ error: "Missing params" }, { status: 400 });
 
 	const session = await getServerSession(authOptions as any);

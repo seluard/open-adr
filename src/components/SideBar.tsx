@@ -7,21 +7,10 @@ import { useSession } from "next-auth/react";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-function uniqueOwners(repos: any[] | undefined) {
-	if (!Array.isArray(repos)) return [];
-	const owners = new Set<string>();
-	repos.forEach(repo => {
-		if (repo.owner?.login) {
-			owners.add(repo.owner.login);
-		}
-	});
-	return Array.from(owners);
-}
-
 
 export default function Sidebar({ onSelectRepo, defaultPublic = false, selectedRepo }: { onSelectRepo: (repo: Record<string, any>) => void, defaultPublic?: boolean, selectedRepo?: Record<string, any> | null }) {
 	const { data: session } = useSession();
-	const { data, error } = useSWR(session ? "/api/github/repos" : null, fetcher);
+	const { data } = useSWR(session ? "/api/github/repos" : null, fetcher);
 	const [selectedId, setSelectedId] = useState<number | null>(null);
 	const [orgFilter, setOrgFilter] = useState<string[]>([]);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -41,17 +30,6 @@ export default function Sidebar({ onSelectRepo, defaultPublic = false, selectedR
 	}, [dropdownOpen]);
 	const [nameFilter, setNameFilter] = useState<string>("");
 
-	// Sync external selection
-	useEffect(() => {
-		if (selectedRepo?.id != null) {
-			// Accept string or number ids
-			// @ts-ignore
-			setSelectedId(selectedRepo.id as any);
-			// Ensure UI mode aligns with selection context
-			if (!session && !publicSearch) setPublicSearch(true);
-		}
-	}, [selectedRepo, session]);
-
 	// Switch for public search
 	const [publicSearch, setPublicSearch] = useState<boolean>(defaultPublic || !session);
 	const [publicRepos, setPublicRepos] = useState<any[]>([]);
@@ -70,6 +48,14 @@ export default function Sidebar({ onSelectRepo, defaultPublic = false, selectedR
 		}
 		return () => clearTimeout(timeout);
 	}, [publicSearch, nameFilter]);
+
+	// Sync external selection (after publicSearch is declared)
+	useEffect(() => {
+		if (selectedRepo?.id != null) {
+			setSelectedId(Number((selectedRepo as any).id));
+			if (!session && !publicSearch) setPublicSearch(true);
+		}
+	}, [selectedRepo, session, publicSearch]);
 
 	// Group owners: treat user as an organization
 	let orgOptions = Array.isArray(data)
