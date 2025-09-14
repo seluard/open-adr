@@ -19,9 +19,9 @@ function uniqueOwners(repos: any[] | undefined) {
 }
 
 
-export default function Sidebar({ onSelectRepo }: { onSelectRepo: (repo: Record<string, any>) => void }) {
-	const { data, error } = useSWR("/api/github/repos", fetcher);
+export default function Sidebar({ onSelectRepo, defaultPublic = false, selectedRepo }: { onSelectRepo: (repo: Record<string, any>) => void, defaultPublic?: boolean, selectedRepo?: Record<string, any> | null }) {
 	const { data: session } = useSession();
+	const { data, error } = useSWR(session ? "/api/github/repos" : null, fetcher);
 	const [selectedId, setSelectedId] = useState<number | null>(null);
 	const [orgFilter, setOrgFilter] = useState<string[]>([]);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -41,14 +41,25 @@ export default function Sidebar({ onSelectRepo }: { onSelectRepo: (repo: Record<
 	}, [dropdownOpen]);
 	const [nameFilter, setNameFilter] = useState<string>("");
 
+	// Sync external selection
+	useEffect(() => {
+		if (selectedRepo?.id != null) {
+			// Accept string or number ids
+			// @ts-ignore
+			setSelectedId(selectedRepo.id as any);
+			// Ensure UI mode aligns with selection context
+			if (!session && !publicSearch) setPublicSearch(true);
+		}
+	}, [selectedRepo, session]);
+
 	// Switch for public search
-	const [publicSearch, setPublicSearch] = useState(false);
+	const [publicSearch, setPublicSearch] = useState<boolean>(defaultPublic || !session);
 	const [publicRepos, setPublicRepos] = useState<any[]>([]);
 	useEffect(() => {
 		let timeout: NodeJS.Timeout;
 		if (publicSearch && nameFilter.length > 2) {
 			timeout = setTimeout(() => {
-				fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(nameFilter)}&per_page=10`)
+				fetch(`/api/github/search?q=${encodeURIComponent(nameFilter)}&per_page=10`)
 					.then(res => res.json())
 					.then(res => {
 						setPublicRepos(Array.isArray(res.items) ? res.items : []);
@@ -77,6 +88,12 @@ export default function Sidebar({ onSelectRepo }: { onSelectRepo: (repo: Record<
 			return matchesOrg && matchesName;
 		})
 		: [];
+
+	// Avoid duplicates: exclude selected repo from displayed lists
+	const selectedOwner = selectedRepo?.owner?.login;
+	const selectedName = selectedRepo?.name;
+	const publicReposDisplay = publicRepos.filter((r) => !(selectedOwner && selectedName && r.owner?.login === selectedOwner && r.name === selectedName));
+	const filteredReposDisplay = filteredRepos.filter((r: any) => !(selectedOwner && selectedName && r.owner?.login === selectedOwner && r.name === selectedName));
 
 	return (
 		<aside className="w-64 h-screen p-4 overflow-y-auto">
@@ -107,7 +124,20 @@ export default function Sidebar({ onSelectRepo }: { onSelectRepo: (repo: Record<
 			</div>
 			{publicSearch ? (
 				<ul className="space-y-3 pb-2 pr-1">
-					{publicRepos.map((repo: any) => (
+					{selectedRepo && (
+						<li
+							key={`pinned-${selectedRepo.id}`}
+							onClick={() => { /* preserve selection */ onSelectRepo(selectedRepo); }}
+							className={`cursor-pointer p-3 rounded-xl transition-all duration-200 bg-gray-50 border border-gray-200 shadow ${
+								selectedId === (selectedRepo as any).id ? "ring-2 ring-gray-300" : ""
+							}`}
+						>
+							<div className="text-[10px] uppercase tracking-wide text-gray-500 mb-1">Selected</div>
+							<div className="font-semibold text-base">{selectedRepo.name}</div>
+							<div className="text-xs text-gray-500">{selectedRepo.owner?.login}/{selectedRepo.name}</div>
+						</li>
+					)}
+					{publicReposDisplay.map((repo: any) => (
 						<li
 							key={repo.id}
 							onClick={() => { setSelectedId(repo.id); onSelectRepo(repo); }}
@@ -120,7 +150,7 @@ export default function Sidebar({ onSelectRepo }: { onSelectRepo: (repo: Record<
 							<div className="text-xs text-gray-400">{repo.owner?.login}</div>
 						</li>
 					))}
-					{publicRepos.length === 0 && nameFilter.length > 2 && (
+					{publicReposDisplay.length === 0 && nameFilter.length > 2 && (
 						<li className="p-3 text-gray-500">No public repositories found.</li>
 					)}
 				</ul>
@@ -165,7 +195,20 @@ export default function Sidebar({ onSelectRepo }: { onSelectRepo: (repo: Record<
 						)}
 					</div>
 					<ul className="space-y-3 pb-2 pr-1">
-						{filteredRepos.map((repo: any) => (
+						{selectedRepo && (
+							<li
+								key={`pinned-auth-${selectedRepo.id}`}
+								onClick={() => { onSelectRepo(selectedRepo); }}
+								className={`cursor-pointer p-3 rounded-xl transition-all duration-200 bg-gray-50 border border-gray-200 shadow ${
+									selectedId === (selectedRepo as any).id ? "ring-2 ring-gray-300" : ""
+								}`}
+							>
+								<div className="text-[10px] uppercase tracking-wide text-gray-500 mb-1">Selected</div>
+								<div className="font-semibold text-base">{selectedRepo.name}</div>
+								<div className="text-xs text-gray-500">{selectedRepo.owner?.login}/{selectedRepo.name}</div>
+							</li>
+						)}
+						{filteredReposDisplay.map((repo: any) => (
 							<li
 								key={repo.id}
 								onClick={() => { setSelectedId(repo.id); onSelectRepo(repo); }}
@@ -177,7 +220,7 @@ export default function Sidebar({ onSelectRepo }: { onSelectRepo: (repo: Record<
 								<div className="text-xs text-gray-500">{repo.full_name}</div>
 							</li>
 						))}
-						{filteredRepos.length === 0 && (
+						{filteredReposDisplay.length === 0 && (
 							<li className="p-3 text-gray-500">No repositories found.</li>
 						)}
 					</ul>
