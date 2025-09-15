@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { useState, useRef, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -14,6 +14,7 @@ export default function Sidebar({ onSelectRepo, defaultPublic = false, selectedR
 	const [selectedId, setSelectedId] = useState<number | null>(null);
 	const [orgFilter, setOrgFilter] = useState<string[]>([]);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
@@ -82,6 +83,7 @@ export default function Sidebar({ onSelectRepo, defaultPublic = false, selectedR
 	const filteredReposDisplay = filteredRepos.filter((r: any) => !(selectedOwner && selectedName && r.owner?.login === selectedOwner && r.name === selectedName));
 
 	return (
+		<>
 		<aside className="w-64 h-screen p-4 overflow-y-auto">
 			<div className="mb-4">
 				<div className="flex items-center gap-2 mb-2">
@@ -91,6 +93,11 @@ export default function Sidebar({ onSelectRepo, defaultPublic = false, selectedR
 							type="button"
 							className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${publicSearch ? 'bg-blue-600' : 'bg-gray-300'}`}
 							onClick={() => {
+								// If user is not signed in and tries to switch to private (non-public), show modal
+								if (!session && publicSearch) {
+									setShowAuthModal(true);
+									return;
+								}
 								setPublicSearch(!publicSearch);
 								setNameFilter(""); // Clear search bar when toggling
 							}}
@@ -213,5 +220,48 @@ export default function Sidebar({ onSelectRepo, defaultPublic = false, selectedR
 				</>
 			)}
 		</aside>
+
+		{/* Auth required modal */}
+		{showAuthModal && (
+			<div className="fixed inset-0 z-50 flex items-center justify-center">
+				<div
+					className="absolute inset-0 bg-black/40"
+					onClick={() => setShowAuthModal(false)}
+				/>
+				<div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-black/5">
+					<div className="mb-4 flex items-start justify-between">
+						<h3 className="text-lg font-semibold text-gray-900">Sign in required</h3>
+						<button
+							aria-label="Close"
+							className="rounded p-1 text-gray-500 hover:bg-gray-100"
+							onClick={() => setShowAuthModal(false)}
+						>
+							✕
+						</button>
+					</div>
+					<p className="text-sm text-gray-600">
+						To browse your own repositories, please sign in with GitHub. Public repository search will remain available without signing in.
+					</p>
+					<div className="mt-6 flex items-center justify-end gap-3">
+						<button
+							className="rounded-lg border px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+							onClick={() => setShowAuthModal(false)}
+						>
+							Not now
+						</button>
+						<button
+							className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white shadow hover:shadow-md active:translate-y-px"
+							onClick={() => signIn("github")}
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+								<path d="M12 0C5.37 0 0 5.37 0 12a12 12 0 0 0 8.21 11.43c.6.11.82-.26.82-.58 0-.29-.01-1.05-.02-2.06-3.34.73-4.04-1.61-4.04-1.61-.55-1.41-1.34-1.79-1.34-1.79-1.09-.74.08-.72.08-.72 1.2.08 1.84 1.24 1.84 1.24 1.07 1.84 2.8 1.31 3.48 1 .11-.78.42-1.31.76-1.62-2.66-.3-5.47-1.33-5.47-5.92 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.51.12-3.15 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.64.24 2.85.12 3.15.77.84 1.24 1.91 1.24 3.22 0 4.6-2.81 5.61-5.49 5.91.43.37.81 1.1.81 2.22 0 1.6-.02 2.88-.02 3.27 0 .32.22.7.83.58A12 12 0 0 0 24 12c0-6.63-5.37-12-12-12Z" />
+							</svg>
+							Sign in with GitHub
+						</button>
+					</div>
+				</div>
+			</div>
+		)}
+		</>
 	);
 };

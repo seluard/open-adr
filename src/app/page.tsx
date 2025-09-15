@@ -1,19 +1,18 @@
 "use client";
 import AdrBrowser from "@/components/AdrBrowser";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function HomePage() {
 	const { data: session } = useSession();
-	const demoRepos = (process.env.NEXT_PUBLIC_DEMO_REPOS || "seluard/open-adr").split(",").map((s) => s.trim()).filter(Boolean);
-	// local state no longer needed; the browser component encapsulates UI
 
 	// All browsing logic is delegated to the AdrBrowser component
 
 	// Unauthenticated landing hero
 	if (!session) {
 		return (
+			<>
 			<div className="relative flex items-center justify-center min-h-[calc(100vh-2rem)] overflow-x-hidden overflow-y-auto rounded-3xl bg-white/70 dark:bg-white/60">
 				{/* Decorative gradient blobs */}
 				<div className="pointer-events-none absolute inset-0 -z-10">
@@ -32,51 +31,22 @@ export default function HomePage() {
 						Capture, discover, and evolve(soon) ADRs, right where your code lives.
 					</p>
 
-					<div className="flex flex-col sm:flex-row items-center gap-3">
-						<button
-							onClick={() => signIn("github")}
-							className="group inline-flex items-center gap-2 rounded-xl bg-black px-5 py-3 text-white shadow-lg transition hover:shadow-xl active:translate-y-px"
-						>
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
-								<path d="M12 0C5.37 0 0 5.37 0 12a12 12 0 0 0 8.21 11.43c.6.11.82-.26.82-.58 0-.29-.01-1.05-.02-2.06-3.34.73-4.04-1.61-4.04-1.61-.55-1.41-1.34-1.79-1.34-1.79-1.09-.74.08-.72.08-.72 1.2.08 1.84 1.24 1.84 1.24 1.07 1.84 2.8 1.31 3.48 1 .11-.78.42-1.31.76-1.62-2.66-.3-5.47-1.33-5.47-5.92 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.51.12-3.15 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.64.24 2.85.12 3.15.77.84 1.24 1.91 1.24 3.22 0 4.6-2.81 5.61-5.49 5.91.43.37.81 1.1.81 2.22 0 1.6-.02 2.88-.02 3.27 0 .32.22.7.83.58A12 12 0 0 0 24 12c0-6.63-5.37-12-12-12Z" />
-							</svg>
-							Sign in with GitHub
-						</button>
+					{/* Primary CTA: Explore public repositories */}
+					<div className="mb-4 flex items-center justify-center">
 						<Link
-							href="/explore"
-							className="group inline-flex items-center rounded-xl bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 p-[2px] shadow-lg transition hover:shadow-xl active:translate-y-px"
+							aria-label="Explore public repositories"
+							href="/explore?owner=seluard&repo=open-adr"
+							className="group relative inline-flex items-center rounded-2xl p-[2px]"
 						>
-							<span className="inline-flex items-center gap-2 rounded-[10px] bg-white/80 px-5 py-3 text-gray-900 backdrop-blur-sm">
-								<Image src="/globe.svg" alt="" width={20} height={20} className="h-5 w-5 opacity-80 transition group-hover:opacity-100" />
-								<span className="font-medium">Explore public repositories</span>
+							<span className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 blur-lg opacity-60 transition-opacity group-hover:opacity-80" />
+							<span className="relative inline-flex items-center gap-3 rounded-2xl bg-white/90 px-6 py-3 text-base md:text-lg font-semibold text-gray-900 shadow-lg ring-1 ring-black/5 transition-transform group-active:translate-y-px">
+								<Image src="/globe.svg" alt="" width={20} height={20} className="h-5 w-5 opacity-90 transition group-hover:opacity-100" />
+								<span>Try it now — Explore public repos</span>
+								<span className="ml-2 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">no sign-in required</span>
 							</span>
 						</Link>
-						{/* Moved repository link to the Navbar as an icon; button removed here */}
 					</div>
 
-					{demoRepos.length > 0 && (
-						<div className="mt-6 flex flex-col items-center gap-2">
-							<span className="text-sm text-gray-500">Or jump in with Open-ADR itself (meta!)</span>
-							<div className="flex flex-wrap justify-center gap-2">
-								{demoRepos.map((full) => {
-									const [owner, repo] = full.split("/");
-									if (!owner || !repo) return null;
-									return (
-										<Link
-											key={full}
-											href={`/explore?owner=${encodeURIComponent(owner)}&repo=${encodeURIComponent(repo)}`}
-											className="group inline-flex items-center rounded-xl bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 p-[2px] shadow-lg transition hover:shadow-xl active:translate-y-px"
-										>
-											<span className="inline-flex items-center gap-2 rounded-[10px] bg-white/85 px-4 py-2 text-sm text-gray-900 backdrop-blur-sm group-hover:bg-white">
-												<Image src="/file.svg" alt="" width={16} height={16} className="h-4 w-4 opacity-90 transition group-hover:opacity-100" />
-												<span className="font-medium">{owner}/{repo}</span>
-											</span>
-										</Link>
-									);
-								})}
-							</div>
-						</div>
-					)}
 
 					<p className="mt-6 max-w-xl text-sm text-gray-500">
 					</p>
@@ -95,6 +65,29 @@ export default function HomePage() {
 					</div>
 				</div>
 			</div>
+
+			{/* Footer */}
+			<footer className="w-full mt-8">
+				<div className="mx-auto max-w-6xl px-6 py-8 border-t border-gray-200/70 dark:border-white/10 text-sm flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+					<div className="flex items-center gap-2 text-black">
+						<Image src="/logo.png" alt="Open ADR logo" width={24} height={24} className="h-6 w-6 rounded" />
+						<span className="font-medium">Open ADR</span>
+						<span className="text-black">·</span>
+						<span>© {new Date().getFullYear()}</span>
+					</div>
+					<nav className="flex items-center gap-5">
+						<a
+							href="https://github.com/seluard/open-adr"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-black hover:text-black transition-colors"
+						>
+							GitHub
+						</a>
+					</nav>
+				</div>
+			</footer>
+			</>
 		);
 	}
 

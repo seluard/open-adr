@@ -42,7 +42,7 @@ export default function AdrBrowser({ defaultPublic = false, initialOwner, initia
           if (!res.ok) {
             const msg = typeof data?.error === "string" ? data.error : "Failed to load ADRs";
             setListError(/rate limit/i.test(msg)
-              ? "GitHub rate limit alcanzado. Vuelve a intentarlo más tarde o inicia sesión para límites más altos."
+              ? "GitHub rate limit reached. Try again later or sign in for higher limits."
               : msg);
             setAdrs([]);
             return;
